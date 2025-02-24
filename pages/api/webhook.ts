@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('Received webhook data:', webhookData);
 
         // Send a response back
-        res.status(200).json({ message: 'Webhook received successfully' });
+        //res.status(200).json({ message: 'Webhook received successfully' });
 
         var msg = '';
 
@@ -24,11 +24,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 msg = 'No items found in the webhook data';
             }
         }
+        res.status(200).json({ message: msg });
+
     } else {
         // Handle any other HTTP method
         res.setHeader('Allow', ['POST']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
+
 }
 
 export interface Item {
