@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 msg = 'No items found in the webhook data';
             }
         }
-        res.status(200).json({ message: msg });
+        //res.status(200).json({ message: msg });
 
     } else {
         // Handle any other HTTP method
