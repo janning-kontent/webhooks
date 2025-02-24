@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 
-const Home: React.FC = () => {
-    return (
-        <div>
-            <h1>Welcome to the Webhooks Project</h1>
-            <p>This is the homepage for the webhook setup application.</p>
-        </div>
-    );
-};
+export default function Home() {
+  const [data, setData] = useState<any>(null);
 
-export default Home;
+  useEffect(() => {
+    fetch("/api/webhook")
+      .then((response) => response.json())
+      .then((data) => setData(data));
+  }, []);
+
+  return (
+    <div>
+      <h1>Webhook Data</h1>
+      {data ? (
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      ) : (
+        <p>No data received yet.</p>
+      )}
+    </div>
+  );
+}
