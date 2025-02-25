@@ -51,7 +51,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 console.log('Tweet sent successfully:', tweetResponse);
                 res.status(200).json({ message: `Successful tweet: ${tweetResponse.data.text}` });
             } catch (error) {
-                console.error('Error sending tweet:', error);
+                //console.error('Error sending tweet:', error);
+                console.error('Tweet error data:', JSON.stringify(error, null, 2));
                 try {
                     await client.v2.tweet(`Failed to publish item with ID: ${systemId}. Error: ${(error as any).message}`);
                 } catch (tweetError) {
