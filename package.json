@@ -11,7 +11,8 @@
   "dependencies": {
     "next": "^15.1.7",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "twitter-api-v2": "^1.20.1"
   },
   "devDependencies": {
     "@types/node": "latest",

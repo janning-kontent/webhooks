@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import client from '../../utils/twitterClient';
+import TwitterApi from 'twitter-api-v2';
 
 let webhookData: any = null;
 
@@ -44,8 +46,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 messageDeliverySlot
             };
 
-            console.log('Received webhook data:', req.body);
-            res.status(200).json({ message: `Item ID: ${systemId}` });
+            try {
+                const tweetResponse = await client.v2.tweet(`New item published with ID: ${systemId}`);
+                console.log('Tweet sent successfully:', tweetResponse);
+                res.status(200).json({ message: `Successful tweet: ${tweetResponse.data.text}` });
+            } catch (error) {
+                console.error('Error sending tweet:', error);
+                try {
+                    await client.v2.tweet(`Failed to publish item with ID: ${systemId}. Error: ${(error as any).message}`);
+                } catch (tweetError) {
+                    console.error('Tweet error data:', JSON.stringify(tweetError, null, 2));
+                    if (typeof tweetError === 'object' && tweetError !== null && 'data' in tweetError) {
+                        console.error('Error details:', JSON.stringify((tweetError as any).data, null, 2));
+                    }
+                }
+                res.status(500).json({ error: 'Failed to send tweet' });
+            }
         } else {
             res.status(200).json({ message: 'No notifications found in the webhook data' });
         }
@@ -65,7 +81,6 @@ export interface Item {
 export interface TransitionFrom {
     id: string;
 }
-
 
 export interface TransitionTo {
     id: string;
