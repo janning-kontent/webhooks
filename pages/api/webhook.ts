@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import client from '../../utils/twitterClient';
-import TwitterApi from 'twitter-api-v2';
+import { twitterClient } from '../../utils/twitter/twitter';
+import { postToFacebook } from '../../utils/facebook/facebook';
+import { getFacebookAccessToken } from '../../utils/facebook/getAccessToken';
+import { getContentItem } from '../../utils/kontent/getContentItem';
 
 let webhookData: any = null;
 
@@ -46,85 +48,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 messageDeliverySlot
             };
 
+            let testId = "test";//"ecf0947e-fc58-4bbc-a32e-9fca8209e9e8"
+
+
+
             try {
-                const tweetResponse = await client.v2.tweet(`New item published with ID: ${systemId}`);
-                console.log('Tweet sent successfully:', tweetResponse);
-                res.status(200).json({ message: `Successful tweet: ${tweetResponse.data.text}` });
+                //const response = await postToFacebook(message);
+                //const response = await getFacebookAccessToken();
+                const response = await getContentItem(testId);
+                const title = response.data.item.elements.title?.value;
+                const body = response.data.item.elements.body?.value;
+                const image = response.data.item.elements.image?.value[0].url;
+                console.log('Response:', response.data.item.elements);
+                console.log('Test:', title);
+                console.log('Test:', body);
+                console.log('Test:', image);
+                res.status(200).json({ message: 'Webhook success' });
             } catch (error) {
-                //console.error('Error sending tweet:', error);
-                console.error('Tweet error data:', JSON.stringify(error, null, 2));
-                try {
-                    await client.v2.tweet(`Failed to publish item with ID: ${systemId}. Error: ${(error as any).message}`);
-                } catch (tweetError) {
-                    console.error('Tweet error data:', JSON.stringify(tweetError, null, 2));
-                    if (typeof tweetError === 'object' && tweetError !== null && 'data' in tweetError) {
-                        console.error('Error details:', JSON.stringify((tweetError as any).data, null, 2));
-                    }
-                }
-                res.status(500).json({ error: 'Failed to send tweet' });
+                res.status(500).send(`Webhook error: ${error}`);
             }
+
+
+            // try {
+            //     const tweetResponse = await twitterClient.v2.tweet(`New item published with ID: ${systemId}`);
+            //     console.log('Tweet success:', tweetResponse);
+            //     res.status(200).json({ message: 'Tweet success', details: JSON.parse(tweetResponse.data.text) });
+            // } catch (error) {
+            //     const errorDetails = JSON.stringify(error, null, 2);
+            //     console.error('Tweet error:', errorDetails);
+            //     res.status(200).json({ message: 'Tweet error', details: JSON.parse(errorDetails) });
+            // }
         } else {
             res.status(200).json({ message: 'No notifications found in the webhook data' });
         }
     } else if (req.method === 'GET') {
         res.status(200).json(webhookData || { message: 'No data received yet.' });
     } else {
-        // Handle any other HTTP method
         res.setHeader('Allow', ['POST', 'GET']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-}
-
-export interface Item {
-    id: string;
-}
-
-export interface TransitionFrom {
-    id: string;
-}
-
-export interface TransitionTo {
-    id: string;
-}
-
-export interface WorkflowEventItem {
-    id: string;
-    event: string;
-    item: Item;
-    transition_from: TransitionFrom;
-    transition_to: TransitionTo;
-}
-
-export interface Data {
-    items: WorkflowEventItem[];
-    system: {
-        id: string;
-        name: string;
-        codename: string;
-        collection: string;
-        workflow: string;
-        workflow_step: string;
-        language: string;
-        type: string;
-        last_modified: string;
-    };
-}
-
-export interface Message {
-    id: string;
-    project_id: string;
-    type: string;
-    operation: string;
-    api_name: string;
-    created_timestamp: string;
-    webhook_url: string;
-    environment_id: string;
-    object_type: string;
-    action: string;
-    delivery_slot: string;
-}
-
-export interface WebhookNotification {
-    data: Data;
-    message: Message;
 }
