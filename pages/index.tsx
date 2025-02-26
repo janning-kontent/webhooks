@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Webhook Data</h1>
+      <h1>Kontent.ai - Social Posting</h1>
       {data ? (
         <pre>{JSON.stringify(data, null, 2)}</pre>
       ) : (

@@ -13,7 +13,6 @@ export const getContentItem = async (id: string) => {
                 Accept: 'application/json',
             }
         });
-        //console.log('Kontent response:', response.data.item.elements.image);
         return response;
     } catch (error) {
         const axiosError = error as any;

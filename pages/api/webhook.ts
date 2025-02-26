@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { twitterClient } from '../../utils/twitter/twitter';
-import { postToFacebook } from '../../utils/facebook/facebook';
-import { getFacebookAccessToken } from '../../utils/facebook/getAccessToken';
 import { getContentItem } from '../../utils/kontent/getContentItem';
+import { twitterClient } from '../../utils/twitter/twitter';
 
 let webhookData: any = null;
 
@@ -50,8 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             let testId = "test";//"ecf0947e-fc58-4bbc-a32e-9fca8209e9e8"
 
-
-
             try {
                 //const response = await postToFacebook(message);
                 //const response = await getFacebookAccessToken();
@@ -59,13 +55,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const title = response.data.item.elements.title?.value;
                 const body = response.data.item.elements.body?.value;
                 const image = response.data.item.elements.image?.value[0].url;
-                console.log('Response:', response.data.item.elements);
-                console.log('Test:', title);
-                console.log('Test:', body);
-                console.log('Test:', image);
+                const channel = response.data.item.elements.channel?.value[0].codename;
+                console.log('Title:', title);
+                console.log('Body:', body);
+                console.log('Image:', image);
+                console.log('Channel:', channel);
+                if (channel === "x") {
+                    try {
+                        const tweetResponse = await twitterClient.v2.tweet(title);
+                        console.log('Tweet success:', tweetResponse);
+                    } catch (error) {
+                        const errorDetails = JSON.stringify(error, null, 2);
+                        console.error('Tweet error:', errorDetails);
+                        res.status(500).json({ message: 'Tweet error', details: JSON.parse(errorDetails) });
+                    }
+                }
+
                 res.status(200).json({ message: 'Webhook success' });
             } catch (error) {
-                res.status(500).send(`Webhook error: ${error}`);
+                const errorDetails = JSON.stringify(error, null, 2);
+                console.error('Webhook error:', errorDetails);
+                if (error instanceof Error && (error as any).status === 400) {
+                    res.status(400).json({ message: 'Client error', details: JSON.parse(errorDetails) });
+                } else {
+                    res.status(500).json({ message: 'Server error', details: JSON.parse(errorDetails) });
+                }
             }
 
 
