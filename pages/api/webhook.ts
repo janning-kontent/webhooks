@@ -57,8 +57,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 //const response = await getFacebookAccessToken();
                 const response = await getContentItem(system.codename);
                 const title = response.data.item.elements.title?.value || null;
-                const body = response.data.item.elements.body?.value || null;
-                const image = response.data.item.elements.image?.value[0].url || null;
+                const body = "";//response.data.item.elements.body?.value || null;
+                const image = "";//response.data.item.elements.image?.value[0].url || null;
                 const channel = response.data.item.elements.channel?.value[0].codename || null;
                 console.log('Title:', title);
                 console.log('Body:', body);
