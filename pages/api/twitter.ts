@@ -117,7 +117,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 res.status(200).json({ message: 'Twitter webhook success' });
             } catch (error) {
-                res.status(500).send(`Twitter webhook error: ${error}`);
+                //res.status(500).send(`Twitter webhook error: ${error}`);
+                const errorDetails = JSON.stringify(error, null, 2);
+                console.error('Tweet error:', errorDetails);
+                res.status(500).json({ message: 'Twitter webhook error', details: JSON.parse(errorDetails) });
             }
 
         } else {
