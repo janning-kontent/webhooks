@@ -16,6 +16,8 @@
     "@kontent-ai/delivery-sdk": "^15.2.0",
     "@kontent-ai/management-sdk": "^7.6.1",
     "@kontent-ai/webhook-helper": "^3.0.4",
+    "@types/jsdom": "^21.1.7",
+    "jsdom": "^26.0.0",
     "next": "^15.1.7",
     "react": "latest",
     "react-dom": "latest",
