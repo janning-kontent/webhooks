@@ -7,6 +7,14 @@ import { JSDOM } from 'jsdom';
 
 let webhookData: any = null;
 
+interface ContentItem {
+    [x: string]: any;
+    post?: string;
+    hashtags?: string;
+    hashtags__ad_hoc_?: string;
+    image?: string;
+}
+
 function convertHtmlToTweet(html: string): string {
     const dom = new JSDOM(html);
     const doc = dom.window.document;
@@ -73,15 +81,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             try {
                 const response = await getContentItem(system.codename);
-                const post = response.data.item.elements.post?.value || null;
+                const post = (response.data as any).item.elements.post?.value || null;
                 const formattedText = convertHtmlToTweet(post);
-                const hashtags = response.data.item.elements.hashtags?.value || [];
+                const hashtags = (response.data as any).item.elements.hashtags?.value || [];
                 let formattedHashtags = '';
                 if (hashtags.length > 0) {
                     formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
                 }
 
-                const adHocHashtags = response.data.item.elements.hashtags__ad_hoc_?.value || '';
+                const adHocHashtags = (response.data as any).item.elements.hashtags__ad_hoc_?.value || '';
                 let formattedAdHocHashtags = '';
                 if (adHocHashtags) {
                     formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
@@ -90,10 +98,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
 
                 let mediaId: string | null = null;
-                if (response.data.item.elements.image?.value) {
-                    const imageUrl = response.data.item.elements.image?.value[0].url;
+                if ((response.data as any).item.elements.image?.value) {
+                    const imageUrl = (response.data as any).item.elements.image?.value[0].url;
                     const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-                    const mediaData = Buffer.from(imageResponse.data, 'binary');
+                    const mediaData = Buffer.from(imageResponse.data as ArrayBuffer);
 
                     try {
                         mediaId = await twitterClient.v1.uploadMedia(mediaData, { mimeType: 'image/jpeg' });

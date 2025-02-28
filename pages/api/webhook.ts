@@ -1,3 +1,4 @@
+/*
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { twitterClient } from '../../utils/twitter/twitter';
 import { postToFacebook } from '../../utils/facebook/facebook';
@@ -88,4 +89,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.setHeader('Allow', ['POST', 'GET']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-}
+}*/

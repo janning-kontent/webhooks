@@ -12,11 +12,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@kontent-ai/core-sdk": "^10.9.0",
-    "@kontent-ai/delivery-sdk": "^15.2.0",
-    "@kontent-ai/management-sdk": "^7.6.1",
-    "@kontent-ai/webhook-helper": "^3.0.4",
     "@types/jsdom": "^21.1.7",
+    "axios": "^1.8.1",
     "jsdom": "^26.0.0",
     "next": "^15.1.7",
     "react": "latest",
@@ -24,6 +21,7 @@
     "twitter-api-v2": "^1.20.1"
   },
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/node": "latest",
     "@types/react": "latest",
     "typescript": "latest"
