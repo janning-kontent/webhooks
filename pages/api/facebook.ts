@@ -100,6 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 // res.status(500).json({ message: 'Facebook webhook error', details: JSON.parse(errorDetails), details2: JSON.stringify(error.response?.data, null, 2) });
                 res.status(500).json({ message: 'Facebook webhook error', details: JSON.stringify(error.response?.data, null, 2) });
+                throw new Error(error);
             }
 
         } else {
