@@ -4,7 +4,7 @@ export default function Home() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/webhook")
+    fetch("/api/facebook")
       .then((response) => response.json())
       .then((data) => setData(data));
   }, []);
