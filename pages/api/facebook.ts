@@ -90,15 +90,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 console.log('Post success:', postResponse.data);
                 res.status(200).json({ message: 'Facebook webhook success' });
+                return "Facebook post success";
             } catch (error) {
                 const errorDetails = JSON.stringify(error, null, 2);
                 console.error('Facebook post error:', errorDetails);
                 console.error('Full Error:', JSON.stringify(error.response?.data, null, 2));
                 // Write detailed error message to index.js
-                const errorLogPath = path.join(process.cwd(), 'index.js');
-                fs.appendFileSync(errorLogPath, `Facebook post error: ${errorDetails}\n`);
+                //const errorLogPath = path.join(process.cwd(), 'index.js');
+                //fs.appendFileSync(errorLogPath, `Facebook post error: ${errorDetails}\n`);
 
                 res.status(500).json({ message: 'Facebook webhook error', details: JSON.parse(errorDetails), details2: JSON.stringify(error.response?.data, null, 2) });
+                return JSON.stringify(error.response?.data, null, 2)
             }
 
         } else {
