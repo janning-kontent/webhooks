@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { getFacebookAccessToken } from './getAccessToken';
+import { getAccessToken } from './getAccessToken';
 
 const FACEBOOK_GRAPH_API_URL = 'https://graph.facebook.com/v11.0';
 //const API_BASE = 'https://graph.facebook.com/v15.0';
 
 export const postToFacebook = async (message: string) => {
     try {
-        const userToken = await getFacebookAccessToken();
+        const userToken = await getAccessToken();
         const pageResp = await fetch(`${FACEBOOK_GRAPH_API_URL}/me/accounts?access_token=${userToken}`);
         console.log('Facebook page response:', pageResp);
         //        const response = await axios.post(
