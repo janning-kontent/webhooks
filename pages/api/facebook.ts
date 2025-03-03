@@ -1,9 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ContentItem } from '../../interfaces/ContentItem';
 import { getContentItem } from '../../utils/kontent/getContentItem';
 import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
 
@@ -91,13 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
             } catch (error) {
                 const errorDetails = JSON.stringify(error, null, 2);
-                //console.error('Facebook post error:', errorDetails);
                 console.error('Facebook post error:', JSON.stringify(error.response?.data, null, 2));
-                // Write detailed error message to index.js
-                //const errorLogPath = path.join(process.cwd(), 'index.js');
-                //fs.appendFileSync(errorLogPath, `Facebook post error: ${errorDetails}\n`);
-
-                // res.status(500).json({ message: 'Facebook webhook error', details: JSON.parse(errorDetails), details2: JSON.stringify(error.response?.data, null, 2) });
                 res.status(500).json({ message: 'Facebook webhook error', details: JSON.stringify(error.response?.data, null, 2) });
                 throw new Error(error);
             }

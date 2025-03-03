@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ContentItem } from '../../interfaces/ContentItem';
 import { twitterClient } from '../../utils/twitter/getTwitterClient';
 import { getContentItem } from '../../utils/kontent/getContentItem';
-import fs from 'fs';
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
-import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
 
@@ -123,7 +122,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.status(200).json({ message: 'Twitter webhook success' });
                 }
             } catch (error) {
-                //res.status(500).send(`Twitter webhook error: ${error}`);
                 const errorDetails = JSON.stringify(error, null, 2);
                 console.error('Tweet error:', errorDetails);
                 res.status(500).json({ message: 'Twitter webhook error', details: JSON.parse(errorDetails) });
