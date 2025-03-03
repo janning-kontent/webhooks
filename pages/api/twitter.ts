@@ -78,15 +78,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     throw new Error('No data found in the Kontent response');
                 } else {
                     const data: ContentItem = response.data as ContentItem;
-                    const post = data.elements.post?.value || null;
+                    const post = data.item.elements.post?.value || null;
                     const formattedText = convertHtmlToTweet(post);
-                    const hashtags = data.elements.hashtags?.value || [];
+                    const hashtags = data.item.elements.hashtags?.value || [];
                     let formattedHashtags = '';
                     if (hashtags.length > 0) {
                         formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
                     }
 
-                    const adHocHashtags = data.elements.hashtags__ad_hoc_?.value || '';
+                    const adHocHashtags = data.item.elements.hashtags__ad_hoc_?.value || '';
                     let formattedAdHocHashtags = '';
                     if (adHocHashtags) {
                         formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
@@ -95,8 +95,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
 
                     let mediaId: string | null = null;
-                    if (data.elements.image?.value) {
-                        const imageUrl = data.elements.image?.value[0].url;
+                    if (data.item.elements.image?.value) {
+                        const imageUrl = data.item.elements.image?.value[0].url;
                         const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
                         const mediaData = Buffer.from(imageResponse.data as ArrayBuffer);
 

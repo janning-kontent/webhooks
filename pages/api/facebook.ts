@@ -7,7 +7,7 @@ import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
 
-const access_token = process.env.FACEBOOK_ACCESS_TOKEN;
+const page_access_token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
 const pageId = process.env.FACEBOOK_PAGE_ID;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -58,29 +58,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     throw new Error('No data found in the Kontent response');
                 } else {
                     const data: ContentItem = response.data as ContentItem;
-                    const post = data.elements.post?.value || null;
+                    const post = data.item.elements.post?.value || null;
+                    console.log(post);
 
-                    const hashtags = data.elements.hashtags?.value || [];
+                    const hashtags = data.item.elements.hashtags?.value || [];
                     let formattedHashtags = '';
                     if (hashtags.length > 0) {
                         formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
                     }
 
-                    const adHocHashtags = data.elements.hashtags__ad_hoc_?.value || '';
+                    const adHocHashtags = data.item.elements.hashtags__ad_hoc_?.value || '';
                     let formattedAdHocHashtags = '';
                     if (adHocHashtags) {
                         formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
                     }
 
                     const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
-                    const imageUrl = data.elements.image?.value[0].url;
+                    const imageUrl = data.item.elements.image?.value[0].url;
 
                     const postResponse = await axios.post(
                         `https://graph.facebook.com/${pageId}/photos`,
+                        //`https://graph.facebook.com/${pageId}/feed`,
                         {
                             message: post + '\n\n' + finalHashtags,
                             url: imageUrl,
-                            access_token: access_token
+                            access_token: page_access_token
                         }
                     );
 
