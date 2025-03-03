@@ -3,16 +3,9 @@ import { getContentItem } from '../../utils/kontent/getContentItem';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
-
-interface ContentItem {
-    [x: string]: any;
-    post?: string;
-    hashtags?: string;
-    hashtags__ad_hoc_?: string;
-    image?: string;
-}
 
 const access_token = process.env.FACEBOOK_ACCESS_TOKEN;
 const pageId = process.env.FACEBOOK_PAGE_ID;
@@ -60,36 +53,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
 
             try {
-                const response = await <ContentItem>getContentItem(system.codename);
-                const data = response.data;
-                const post = data.item.elements.post?.value || null;
+                const response = await getContentItem(system.codename);
+                if (!response.data) {
+                    throw new Error('No data found in the Kontent response');
+                } else {
+                    const data: ContentItem = response.data as ContentItem;
+                    const post = data.elements.post?.value || null;
 
-                const hashtags = data.item.elements.hashtags?.value || [];
-                let formattedHashtags = '';
-                if (hashtags.length > 0) {
-                    formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
-                }
-
-                const adHocHashtags = data.item.elements.hashtags__ad_hoc_?.value || '';
-                let formattedAdHocHashtags = '';
-                if (adHocHashtags) {
-                    formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
-                }
-
-                const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
-                const imageUrl = data.item.elements.image?.value[0].url;
-
-                const postResponse = await axios.post(
-                    `https://graph.facebook.com/${pageId}/photos`,
-                    {
-                        message: post + '\n\n' + finalHashtags,
-                        url: imageUrl,
-                        access_token: access_token
+                    const hashtags = data.elements.hashtags?.value || [];
+                    let formattedHashtags = '';
+                    if (hashtags.length > 0) {
+                        formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
                     }
-                );
 
-                console.log('Post success:', postResponse.data);
-                res.status(200).json({ message: 'Facebook webhook success', data: postResponse.data });
+                    const adHocHashtags = data.elements.hashtags__ad_hoc_?.value || '';
+                    let formattedAdHocHashtags = '';
+                    if (adHocHashtags) {
+                        formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
+                    }
+
+                    const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
+                    const imageUrl = data.elements.image?.value[0].url;
+
+                    const postResponse = await axios.post(
+                        `https://graph.facebook.com/${pageId}/photos`,
+                        {
+                            message: post + '\n\n' + finalHashtags,
+                            url: imageUrl,
+                            access_token: access_token
+                        }
+                    );
+
+                    console.log('Post success:', postResponse.data);
+                    res.status(200).json({ message: 'Facebook webhook success', data: postResponse.data });
+                }
             } catch (error) {
                 const errorDetails = JSON.stringify(error, null, 2);
                 //console.error('Facebook post error:', errorDetails);

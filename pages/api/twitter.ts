@@ -1,19 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { twitterClient } from '../../utils/twitter/twitter';
+import { twitterClient } from '../../utils/twitter/getTwitterClient';
 import { getContentItem } from '../../utils/kontent/getContentItem';
 import fs from 'fs';
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
-
-interface ContentItem {
-    [x: string]: any;
-    post?: string;
-    hashtags?: string;
-    hashtags__ad_hoc_?: string;
-    image?: string;
-}
 
 function convertHtmlToTweet(html: string): string {
     const dom = new JSDOM(html);
@@ -81,49 +74,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             try {
                 const response = await getContentItem(system.codename);
-                const post = (response.data as any).item.elements.post?.value || null;
-                const formattedText = convertHtmlToTweet(post);
-                const hashtags = (response.data as any).item.elements.hashtags?.value || [];
-                let formattedHashtags = '';
-                if (hashtags.length > 0) {
-                    formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
-                }
-
-                const adHocHashtags = (response.data as any).item.elements.hashtags__ad_hoc_?.value || '';
-                let formattedAdHocHashtags = '';
-                if (adHocHashtags) {
-                    formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
-                }
-
-                const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
-
-                let mediaId: string | null = null;
-                if ((response.data as any).item.elements.image?.value) {
-                    const imageUrl = (response.data as any).item.elements.image?.value[0].url;
-                    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-                    const mediaData = Buffer.from(imageResponse.data as ArrayBuffer);
-
-                    try {
-                        mediaId = await twitterClient.v1.uploadMedia(mediaData, { mimeType: 'image/jpeg' });
-                    } catch (error) {
-                        console.error('Error uploading media:', error);
-                    }
-                }
-
-                if (mediaId) {
-                    const tweetResponse = await twitterClient.v2.tweet({
-                        text: `${formattedText}\n\n${finalHashtags}`,
-                        media: { media_ids: [mediaId] }
-                    });
-                    console.log('Tweet success:', tweetResponse);
+                if (!response.data) {
+                    throw new Error('No data found in the Kontent response');
                 } else {
-                    const tweetResponse = await twitterClient.v2.tweet(
-                        `${formattedText}\n\n${finalHashtags}`
-                    );
-                    console.log('Tweet success:', tweetResponse);
-                }
+                    const data: ContentItem = response.data as ContentItem;
+                    const post = data.elements.post?.value || null;
+                    const formattedText = convertHtmlToTweet(post);
+                    const hashtags = data.elements.hashtags?.value || [];
+                    let formattedHashtags = '';
+                    if (hashtags.length > 0) {
+                        formattedHashtags = hashtags.map(tag => `#${tag.name}`).join(' ');
+                    }
 
-                res.status(200).json({ message: 'Twitter webhook success' });
+                    const adHocHashtags = data.elements.hashtags__ad_hoc_?.value || '';
+                    let formattedAdHocHashtags = '';
+                    if (adHocHashtags) {
+                        formattedAdHocHashtags = adHocHashtags.split(',').map(tag => `#${tag.trim()}`).join(' ');
+                    }
+
+                    const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
+
+                    let mediaId: string | null = null;
+                    if (data.elements.image?.value) {
+                        const imageUrl = data.elements.image?.value[0].url;
+                        const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+                        const mediaData = Buffer.from(imageResponse.data as ArrayBuffer);
+
+                        try {
+                            mediaId = await twitterClient.v1.uploadMedia(mediaData, { mimeType: 'image/jpeg' });
+                        } catch (error) {
+                            console.error('Error uploading media:', error);
+                        }
+                    }
+
+                    if (mediaId) {
+                        const tweetResponse = await twitterClient.v2.tweet({
+                            text: `${formattedText}\n\n${finalHashtags}`,
+                            media: { media_ids: [mediaId] }
+                        });
+                        console.log('Tweet success:', tweetResponse);
+                    } else {
+                        const tweetResponse = await twitterClient.v2.tweet(
+                            `${formattedText}\n\n${finalHashtags}`
+                        );
+                        console.log('Tweet success:', tweetResponse);
+                    }
+
+                    res.status(200).json({ message: 'Twitter webhook success' });
+                }
             } catch (error) {
                 //res.status(500).send(`Twitter webhook error: ${error}`);
                 const errorDetails = JSON.stringify(error, null, 2);
