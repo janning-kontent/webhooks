@@ -39,10 +39,14 @@ https://developers.facebook.com/tools/explorer/
    • publish_to_groups (if posting to a group)
    ```
 2. If posting to a Page, use a Page Access Token.
+   ```bash
    https://graph.facebook.com/v18.0/oauth/access_token
    ?grant_type=fb_exchange_token
    &client_id={your-app-id}
    &client_secret={your-app-secret}
    &fb_exchange_token={short-lived-user-token}
+   ```
 3. Then, exchange it for a Page Access Token:
+   ```bash
    https://graph.facebook.com/v18.0/{page-id}?fields=access_token&access_token={long-lived-user-token}
+   ```
