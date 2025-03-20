@@ -12,6 +12,9 @@ export interface ContentItem {
             last_modified: string;
         };
         elements: {
+            channel?: {
+                value: Array<{ name: string }>;
+            };
             post?: {
                 value: string;
             };
@@ -22,6 +25,12 @@ export interface ContentItem {
                 value: string;
             };
             image?: {
+                value: Array<{ url: string }>;
+            };
+            video_url?: {
+                value: string;
+            };
+            video?: {
                 value: Array<{ url: string }>;
             };
         };
