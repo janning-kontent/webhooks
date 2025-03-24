@@ -13,7 +13,7 @@ export interface ContentItem {
         };
         elements: {
             channel?: {
-                value: Array<{ name: string }>;
+                value: Array<{ name: string, codename: string }>;
             };
             post?: {
                 value: string;
@@ -26,6 +26,9 @@ export interface ContentItem {
             };
             image?: {
                 value: Array<{ url: string }>;
+            };
+            image_url?: {
+                value: string;
             };
             video_url?: {
                 value: string;

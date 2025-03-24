@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ContentItem } from '../../interfaces/ContentItem';
-import { getContentItem } from '../../utils/kontent/getContentItem';
+import { getContentItem } from '../kontent/getContentItem';
 import axios from 'axios';
 
 let webhookData: any = null;

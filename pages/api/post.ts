@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ContentItem } from '../../interfaces/ContentItem';
+
 import { getContentItem } from '../../utils/kontent/getContentItem';
 import postToTwitter from '../../utils/twitter/postTwitter';
+import postToFacebook from '../../utils/facebook/postFacebook';
+
+import { ApiKeys } from '../../interfaces/ApiKeys';
+import { ContentItem } from '../../interfaces/ContentItem';
 
 let webhookData: any = null;
 
@@ -53,20 +57,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
 
             try {
-                // Fetch content item from Kontent
-                const response = await getContentItem(system.codename);
-                if (!response.data) {
-                    throw new Error('No content item found in the Kontent response');
+                //Fetch API Keys    
+                const apiKeys = await getContentItem('api_keys');
+                if (!apiKeys.data) {
+                    throw new Error('No API Keys found in the Kontent response');
                 } else {
-                    const data: ContentItem = response.data as ContentItem;
+                    const apiKeysData: ApiKeys = apiKeys.data as ApiKeys;
 
-                    // Determine the channel and post to Twitter if applicable
-                    const channel = data.item.elements.channel?.value[0].name || null;
-                    if (channel === 'Twitter(X)') {
-                        await postToTwitter(data);
+                    // Fetch content item
+                    const response = await getContentItem(system.codename);
+                    if (!response.data) {
+                        throw new Error('No content item found in the Kontent response');
+                    } else {
+                        const postData: ContentItem = response.data as ContentItem;
+
+                        // Determine the channel and post to Twitter if applicable
+                        const channel = postData.item.elements.channel.value[0].codename || null;
+                        if (channel === 'twitter_x_') {
+                            await postToTwitter(postData, apiKeysData);
+                        }
+
+                        if (channel === 'facebook') {
+                            //await postToFacebook(postData, apiKeysData);
+                        }
+
+                        res.status(200).json({ message: 'Social Post webhook success' });
                     }
-
-                    res.status(200).json({ message: 'Social Post webhook success' });
                 }
             } catch (error) {
                 // Handle errors and send detailed response
@@ -88,4 +104,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(405).end(`Method ${req.method} not allowed`);
     }
 }
-
