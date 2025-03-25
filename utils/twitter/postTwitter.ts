@@ -37,9 +37,9 @@ export default async function twitter(socialPost: ContentItem, apiKeysData: ApiK
         imageId = await uploadMedia(imageUrl, "image/jpeg", twitterClient);
     }
 
-    if (socialPost.item.elements.video?.value && socialPost.item.elements.video?.value.length > 0) {
-        const videoUrl = socialPost.item.elements.video?.value[0].url || null;
-        //const videoUrl = socialPost.item.elements.video_url?.value[0].url || null;
+    if (socialPost.item.elements.video_url?.value && socialPost.item.elements.video_url?.value.length > 0) {
+        //const videoUrl = socialPost.item.elements.video?.value[0].url || null;
+        const videoUrl = socialPost.item.elements.video_url?.value || null;
         videoId = await uploadMedia(videoUrl, "video/mp4", twitterClient);
     }
 
