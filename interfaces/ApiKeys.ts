@@ -19,6 +19,12 @@ export interface ApiKeys {
             facebook_client_secret: {
                 value: string;
             };
+            facebook_page_id: {
+                value: string;
+            };
+            facebook_access_token: {
+                value: string;
+            };
             twitter_api_key?: {
                 value: string;
             };

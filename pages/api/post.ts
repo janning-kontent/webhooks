@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         }
 
                         if (channel === 'facebook') {
-                            //await postToFacebook(postData, apiKeysData);
+                            await postToFacebook(postData, apiKeysData);
                         }
 
                         res.status(200).json({ message: 'Social Post webhook success' });
