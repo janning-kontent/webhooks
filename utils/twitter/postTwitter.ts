@@ -112,7 +112,9 @@ export async function uploadVideo(videoUrl: string, client: TwitterApi): Promise
         //       console.log('filePath:', filePath);
         //       console.log('mediaSize:', mediaSize);
         //       console.log('chunkSize:', chunkSize);
-
+        if (mediaSize > (512 * 1024 * 1024)) {
+            throw new Error('❌ Video file exceeds Twitter maximum upload size of 512MB. Please compress it.');
+        }
         // INIT
         // const initResponse = await client.v1.post('media/upload.json', {
         //     command: 'INIT',
