@@ -6,6 +6,7 @@ import postToFacebook from '../../utils/facebook/postFacebook';
 
 import { ApiKeys } from '../../interfaces/ApiKeys';
 import { ContentItem } from '../../interfaces/ContentItem';
+import { post } from 'axios';
 
 let webhookData: any = null;
 
@@ -84,11 +85,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         res.status(200).json({ message: 'Social Post webhook success' });
                     }
                 }
-            } catch (error) {
+            } catch (err: any) {
                 // Handle errors and send detailed response
-                const errorDetails = JSON.stringify(error, null, 2);
-                console.error('Tweet error:', error);
+                const errorDetails = JSON.stringify(err, null, 2);
+                console.error('Tweet error:', err);
                 res.status(500).json({ message: 'Social Post webhook error', details: JSON.parse(errorDetails) });
+
+                // Log top-level error message
+                console.error('Message:', err.message);
+
+                // Log response status and data if available
+                if (err?.data) {
+                    console.error('Twitter error data:', err.data);
+                }
+
+                if (err?.response) {
+                    console.error('Status:', err.response.status);
+                    console.error('Status Text:', err.response.statusText);
+                    console.error('Headers:', err.response.headers);
+                    console.error('Body:', await err.response.text?.());
+                }
+
+                // Log full error object as JSON fallback
+                try {
+                    console.error('Full Error:', JSON.stringify(err, null, 2));
+                } catch {
+                    console.error(err);
+                }
+
+                throw err;
             }
 
         } else {
