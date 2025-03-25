@@ -79,7 +79,7 @@ const uploadMedia = async (mediaUrl: string, mediaType: string, client: TwitterA
 }
 
 async function downloadVideo(url: string): Promise<string> {
-    const downloadsDir = path.resolve(__dirname, '../../../../downloads'); // 🔁 adjust for project root
+    const downloadsDir = path.resolve(__dirname, '../../../downloads'); // 🔁 adjust for project root
 
     // Create the downloads folder if it doesn't exist
     if (!fs.existsSync(downloadsDir)) {
