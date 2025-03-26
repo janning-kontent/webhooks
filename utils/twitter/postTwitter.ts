@@ -79,7 +79,9 @@ const uploadMedia = async (mediaUrl: string, mediaType: string, client: TwitterA
 }
 
 async function downloadVideo(url: string): Promise<string> {
-    const downloadsDir = path.resolve(__dirname, '../../../downloads'); // 🔁 adjust for project root
+    //const downloadsDir = path.resolve(__dirname, '../../../downloads'); // 🔁 adjust for project root
+    const downloadsDir = path.resolve(__dirname, '/tmp'); // 🔁 adjust for project root
+    //const writer = fs.createWriteStream(tmpPath);
 
     // Create the downloads folder if it doesn't exist
     if (!fs.existsSync(downloadsDir)) {
@@ -87,8 +89,9 @@ async function downloadVideo(url: string): Promise<string> {
     }
 
     // Generate unique filename
-    const filename = `video-${uuidv4()}.mp4`;
-    const filePath = path.join(downloadsDir, filename);
+    //const filename = `video-${uuidv4()}.mp4`;
+    //const filePath = path.join(downloadsDir, filename);
+    const filePath = path.join('/tmp/', 'video.mp4');
 
     // Stream video to file
     const response = await axios.get<Readable>(url, { responseType: 'stream' });
