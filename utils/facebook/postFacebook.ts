@@ -22,14 +22,16 @@ export default async function facebook(socialPost: ContentItem, apiKeysData: Api
     }
 
     const finalHashtags = `${formattedHashtags} ${formattedAdHocHashtags}`.trim();
-    const imageUrl = socialPost.item.elements.image?.value[0].url;
+    const image = socialPost.item.elements.image?.value[0]?.url || '';
+    const imageUrl = socialPost.item.elements.image_url?.value || '';
+    const finalImageUrl = image.trim() !== '' ? image : imageUrl;
 
     const postResponse = await axios.post(
         `https://graph.facebook.com/${pageId}/photos`,
         //`https://graph.facebook.com/${pageId}/feed`,
         {
             message: post + '\n\n' + finalHashtags,
-            url: imageUrl,
+            url: finalImageUrl,
             access_token: pageAccessToken
         }
     );
