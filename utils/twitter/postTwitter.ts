@@ -44,6 +44,11 @@ export default async function twitter(socialPost: ContentItem, apiKeysData: ApiK
         imageId = await uploadMedia(imageUrl, "image/jpeg", client);
     }
 
+    if (socialPost.item.elements.image_url?.value && socialPost.item.elements.image_url?.value.length > 0) {
+        const imageUrl = socialPost.item.elements.image_url?.value || null;
+        imageId = await uploadMedia(imageUrl, "image/jpeg", client);
+    }
+
     if (socialPost.item.elements.video_url?.value && socialPost.item.elements.video_url?.value.length > 0) {
         //const videoUrl = socialPost.item.elements.video?.value[0].url || null;
         const videoUrl = socialPost.item.elements.video_url?.value || null;

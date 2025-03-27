@@ -7,6 +7,7 @@ import postToFacebook from '../../utils/facebook/postFacebook';
 import { ApiKeys } from '../../interfaces/ApiKeys';
 import { ContentItem } from '../../interfaces/ContentItem';
 import { post } from 'axios';
+import { getManagementClient } from './managementApi';
 
 let webhookData: any = null;
 
@@ -57,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 messageDeliverySlot
             };
 
+            let status = 'Pending';
             try {
                 //Fetch API Keys    
                 const apiKeys = await getContentItem('api_keys');
@@ -76,11 +78,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         const channel = postData.item.elements.channel.value[0].codename || null;
                         if (channel === 'twitter_x_') {
                             await postToTwitter(postData, apiKeysData);
+                            status = 'Published to Twitter : ' + new Date().toISOString();
                         }
 
                         if (channel === 'facebook') {
                             await postToFacebook(postData, apiKeysData);
+                            status = 'Published to Facebook : ' + new Date().toISOString();
                         }
+
+                        /*
+                        const client = getManagementClient();
+                        const responseUpdate = await client
+                            .upsertLanguageVariant()
+                            .byItemCodename(system.codename)
+                            .byLanguageCodename('default')
+                            .withData((builder) => ({
+                                elements: [
+                                    builder.textElement({
+                                        element: { codename: 'status' },
+                                        value: status,
+                                    })
+                                ]
+                            }))
+                            .toPromise();
+                        console.log(responseUpdate);
+                        */
 
                         res.status(200).json({ message: 'Social Post webhook success' });
                     }
@@ -90,6 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const errorDetails = JSON.stringify(err, null, 2);
                 console.error('Tweet error:', err);
                 res.status(500).json({ message: 'Social Post webhook error', details: JSON.parse(errorDetails) });
+                status = 'Error : ' + new Date().toISOString() + ' : ' + JSON.parse(errorDetails);
 
                 // Log top-level error message
                 console.error('Message:', err.message);
