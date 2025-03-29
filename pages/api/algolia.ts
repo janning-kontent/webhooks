@@ -55,6 +55,16 @@ const fullIndex = async (req: any, res: any) => {
 }
 
 const itemIndex = async (req: any, res: any) => {
+    console.log('Request body:', req.body);
+    console.log('Request method:', req.method);
+    console.log('Request headers:', req.headers);
+    console.log('Request query:', req.query);
+    console.log('Request URL:', req.url);
+    console.log('Request path:', req.path);
+    console.log('Request params:', req.params);
+    console.log('Request cookies:', req.cookies);
+    return;
+
     if (req.method === 'POST') {
         const { notifications } = req.body;
 

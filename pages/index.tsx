@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Kontent.ai - Social Posting</h1>
+      <h1>Kontent.ai - Webhooks</h1>
       {error ? (
         <div style={{ color: "red" }}>
           <h2>Error</h2>
