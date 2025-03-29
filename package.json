@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@kontent-ai/delivery-sdk": "^16.0.0",
     "@kontent-ai/management-sdk": "^7.7.0",
     "@types/jsdom": "^21.1.7",
+    "algoliasearch": "^5.23.0",
     "axios": "^1.8.2",
     "dotenv": "^16.4.7",
     "fluent-ffmpeg": "^2.1.3",

@@ -7,7 +7,7 @@ import postToFacebook from '../../utils/facebook/postFacebook';
 import { ApiKeys } from '../../interfaces/ApiKeys';
 import { ContentItem } from '../../interfaces/ContentItem';
 import { post } from 'axios';
-import { getManagementClient } from './managementApi';
+import { getManagementClient } from '../../utils/managementApi';
 
 let webhookData: any = null;
 
