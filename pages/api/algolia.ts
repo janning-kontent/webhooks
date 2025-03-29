@@ -63,6 +63,56 @@ const itemIndex = async (req: any, res: any) => {
     console.log('Request path:', req.path);
     console.log('Request params:', req.params);
     console.log('Request cookies:', req.cookies);
+    const { notifications } = req.body;
+    let webhookData: any = null;
+    // Check if notifications exist and process the first notification
+    if (notifications && notifications.length > 0) {
+        const { data, message } = notifications[0];
+        const { system } = data;
+
+        // Extract system-related data
+        const {
+            id: systemId,
+            name: systemName,
+            codename: systemCodename,
+            collection: systemCollection,
+            workflow: systemWorkflow,
+            workflow_step: systemWorkflowStep,
+            language: systemLanguage,
+            type: systemType,
+            last_modified: systemLastModified
+        } = system;
+
+        // Extract message-related data
+        const {
+            environment_id: messageEnvironmentId,
+            object_type: messageObjectType,
+            action: messageAction,
+            delivery_slot: messageDeliverySlot
+        } = message;
+
+        // Store webhook data for potential GET requests
+        webhookData = {
+            systemId,
+            systemName,
+            systemCodename,
+            systemCollection,
+            systemWorkflow,
+            systemWorkflowStep,
+            systemLanguage,
+            systemType,
+            systemLastModified,
+            messageEnvironmentId,
+            messageObjectType,
+            messageAction,
+            messageDeliverySlot
+        };
+    }
+    console.log('Webhook data:', webhookData);
+
+    console.log('Notifications:', notifications);
+    console.log(notifications.message);
+    console.log(notifications.data);
     return;
 
     if (req.method === 'POST') {
